@@ -8,3 +8,5 @@ A trial application to know the available gym locations
   Jetpack ViewMode
 - Coroutines
 - Retrofit
+
+## Note: The application is still under development
