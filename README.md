@@ -1,5 +1,5 @@
 ## Gym App
-# A trial application to know the available gym locations
+ A trial application to know the available gym locations
 
 - Tools & APIs
 - Jetpack Compose
