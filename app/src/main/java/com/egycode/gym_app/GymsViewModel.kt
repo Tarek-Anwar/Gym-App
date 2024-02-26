@@ -1,71 +1,56 @@
 package com.egycode.gym_app
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class GymsViewModel() : ViewModel() {
+class GymsViewModel : ViewModel() {
 
-    var state by mutableStateOf(emptyList<Gym>())
-    private var gymApiService: GymApiService
+    private var _state by mutableStateOf(
+        GymsScreenState(
+            emptyList(),
+            true
+        )
+    )
 
-    private val gymsDao = GymsDataBase.getDaoInstance(GymsApplication.getApplicationContext())
+    val state : State<GymsScreenState>
+        get() = derivedStateOf { _state }
+
+    private val repo = GymsRepository()
+
+    private val errorHandler = CoroutineExceptionHandler { _, throwable ->
+        throwable.printStackTrace()
+        _state = _state.copy(
+            isLoading = false,
+            error = throwable.message
+        )
+    }
 
     init {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://gyms-fe7ee-default-rtdb.firebaseio.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        gymApiService = retrofit.create(GymApiService::class.java)
         getGyms()
     }
 
     private fun getGyms() {
-        viewModelScope.launch {
-            val gyms = getAllGyms()
-            state = gyms
+        viewModelScope.launch(errorHandler) {
+            val gyms = repo.getAllGyms()
+            _state = GymsScreenState(gyms, false)
         }
-    }
-
-    private suspend fun getAllGyms() = withContext(Dispatchers.IO) {
-        try {
-           updateLocalDatabase()
-        } catch (e: Exception) {
-            if(gymsDao.getAllGyms().isEmpty())
-                throw Exception("Something went wrong . no data found , try connecting to internet.")
-        }
-        gymsDao.getAllGyms()
-    }
-
-    private suspend fun updateLocalDatabase(){
-        val gyms = gymApiService.getGyms()
-        val favouriteGymsList = gymsDao.getFavouriteGyms()
-        gymsDao.addAllGyms(gyms)
-        gymsDao.updateAllFavourite(favouriteGymsList.map{
-            GymsFavouriteState(it.id ,true)
-        })
     }
 
     fun toggleFavouriteState(gymId: Int) {
-        val gyms = state.toMutableList()
+        val gyms = _state.gyms.toMutableList()
         val indexGym = gyms.indexOfFirst { it.id == gymId }
         viewModelScope.launch {
-            state =  toggleFavoriteGym(gymId,!gyms[indexGym].isFavourite)
+           val updateGymsList = repo.toggleFavoriteGym(gymId, !gyms[indexGym].isFavourite)
+            _state = _state.copy(gyms = updateGymsList)
         }
     }
-
-    private suspend fun toggleFavoriteGym(gymId: Int, newFavouriteState: Boolean) = withContext(Dispatchers.IO){
-        gymsDao.setFavouriteGym(GymsFavouriteState(gymId,newFavouriteState))
-        gymsDao.getAllGyms()
-    }
-
 
 
 }
