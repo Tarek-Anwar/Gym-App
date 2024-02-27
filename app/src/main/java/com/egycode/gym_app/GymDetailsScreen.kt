@@ -1,10 +1,13 @@
 package com.egycode.gym_app
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,33 +17,44 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun GymDetailsScreen(){
-    val viewModel : GymDetailsViewModel = viewModel()
+fun GymDetailsScreen() {
 
-    val gymModel = viewModel.state
+    val viewModel: GymDetailsViewModel = viewModel()
+    val state = viewModel.state.value
 
-    gymModel?.let {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-                .padding(16.dp)
-        ) {
-            DefaultIcon(
-                icon = Icons.Filled.Place ,
-                modifier = Modifier.padding(horizontal = 32.dp) ,
-                contentDescription = "Location Gym Icon"
-            )
-            GymDetails(
-                gym = it,
-                modifier =Modifier.padding(32.dp),
-                horizontal = Alignment.CenterHorizontally
-            )
-            Text(
-                text = if(it.isOpen) "Gym is Open" else "Gym is Closed",
-                color = if (it.isOpen) Color.Green else Color.Red
-            )
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        state.gym?.let {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                DefaultIcon(
+                    icon = Icons.Filled.Place,
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                    contentDescription = "Location Gym Icon"
+                )
+                GymDetails(
+                    gym = it,
+                    modifier = Modifier.padding(32.dp),
+                    horizontal = Alignment.CenterHorizontally
+                )
+                Text(
+                    text = if (it.isOpen) "Gym is Open" else "Gym is Closed",
+                    color = if (it.isOpen) Color.Green else Color.Red
+                )
+            }
+
         }
 
-
+        if (state.isLoading) CircularProgressIndicator()
+        if(state.gym == null)
+        {
+            Text(text = state.error.toString())
+        }
     }
 }
