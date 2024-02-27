@@ -7,5 +7,6 @@
 - Coroutines
 - Retrofit
 - Room
+- Presentation Patterns
   
 ## Note: The application is still under development 
