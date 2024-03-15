@@ -1,27 +1,19 @@
-package com.egycode.gym_app
+package com.egycode.gym_app.gyms.data.local
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
 
 @Entity("gyms")
-data class Gym(
+data class LocalGym(
     @PrimaryKey
     @ColumnInfo("gym_id")
-    val id : Int,
-
+    val id: Int,
     @ColumnInfo("gym_name")
-    @SerializedName("gym_name")
     val name: String,
-
     @ColumnInfo("gym_location")
-    @SerializedName("gym_location")
     val place: String,
-
-    @SerializedName("is_open")
-    val isOpen : Boolean,
-
+    val isOpen: Boolean,
     @ColumnInfo("is_favourite")
-    val isFavourite : Boolean = false
+    val isFavourite: Boolean = false
 )

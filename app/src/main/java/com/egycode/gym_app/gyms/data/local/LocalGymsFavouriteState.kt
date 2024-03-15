@@ -1,10 +1,10 @@
-package com.egycode.gym_app
+package com.egycode.gym_app.gyms.data.local
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 
 @Entity
-data class GymsFavouriteState(
+data class LocalGymsFavouriteState(
 
     @ColumnInfo("gym_id")
     val id : Int,

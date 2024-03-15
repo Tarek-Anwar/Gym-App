@@ -1,4 +1,4 @@
-package com.egycode.gym_app
+package com.egycode.gym_app.gyms.persentation.details
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -8,6 +8,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.egycode.gym_app.gyms.data.repo.GymDetailsRepo
+import com.egycode.gym_app.gyms.domain.Gym
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
@@ -42,7 +44,8 @@ class GymDetailsViewModel(
 
     private fun getGym(id: Int) {
         viewModelScope.launch(errorHandler) {
-            val gym = repo.getGymFromRoom(id)
+            val localGym = repo.getGymFromRoom(id)
+            val gym = Gym(localGym.id, localGym.name, localGym.place, localGym.isOpen, localGym.isFavourite)
             _state = if (gym == null) {
                 GymDetailsState(null, false, "Not Gym Found")
             } else {

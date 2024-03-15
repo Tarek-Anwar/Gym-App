@@ -1,4 +1,4 @@
-package com.egycode.gym_app
+package com.egycode.gym_app.gyms.persentation.gymlist
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -25,11 +25,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.egycode.gym_app.gyms.domain.Gym
 
 @Composable
-fun GymScreen( onItemClick : (Int) -> Unit) {
-    val vm: GymsViewModel = viewModel()
-    val state = vm.state.value
+fun GymScreen(
+    state: GymsScreenState,
+    onItemClick : (Int) -> Unit,
+    toggleFavouriteState : (Int , Boolean) -> Unit
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxWidth()
@@ -37,10 +40,9 @@ fun GymScreen( onItemClick : (Int) -> Unit) {
         LazyColumn {
             items(state.gyms) { gym ->
                 GymItem(gym = gym,
-                    onFavoriteItemClick = { vm.toggleFavouriteState(it) },
-                    onItemClick = { onItemClick(it) }
-
-                )
+                    onItemClick = { onItemClick(it) }){ id , isFavourite ->
+                    toggleFavouriteState(id , isFavourite)
+                }
             }
         }
         if (state.isLoading) CircularProgressIndicator()
@@ -54,9 +56,9 @@ fun GymScreen( onItemClick : (Int) -> Unit) {
 @Composable
 fun GymItem(
     gym: Gym,
-    onFavoriteItemClick: (Int) -> Unit,
-    onItemClick : (Int) -> Unit
-) {
+    onItemClick : (Int) -> Unit,
+    onFavoriteItemClick: (Int , Boolean) -> Unit
+    ) {
     val icon = if (gym.isFavourite) Icons.Filled.Favorite
     else Icons.Filled.FavoriteBorder
     Card(
@@ -77,7 +79,7 @@ fun GymItem(
                 modifier = Modifier.weight(.70f)
             )
             DefaultIcon(icon, Modifier.weight(.15f), "Favourite Gym Icon") {
-                onFavoriteItemClick(gym.id)
+                onFavoriteItemClick(gym.id , gym.isFavourite)
             }
         }
     }
