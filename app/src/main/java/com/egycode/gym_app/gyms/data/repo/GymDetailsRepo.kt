@@ -1,5 +1,7 @@
-package com.egycode.gym_app
+package com.egycode.gym_app.gyms.data.repo
 
+import com.egycode.gym_app.GymsApplication
+import com.egycode.gym_app.gyms.data.local.GymsDataBase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

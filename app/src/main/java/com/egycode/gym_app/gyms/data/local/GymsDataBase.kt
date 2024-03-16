@@ -1,4 +1,4 @@
-package com.egycode.gym_app
+package com.egycode.gym_app.gyms.data.local
 
 import android.content.Context
 import androidx.room.Database
@@ -6,8 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [Gym::class],
-    version = 2,
+    entities = [LocalGym::class],
+    version = 3,
     exportSchema = false
 )
 abstract class GymsDataBase : RoomDatabase() {
@@ -17,7 +17,7 @@ abstract class GymsDataBase : RoomDatabase() {
     companion object{
 
         private var daoInstance : GymsDao? = null
-        private fun buildDatabase(context : Context) : GymsDataBase{
+        private fun buildDatabase(context : Context) : GymsDataBase {
             return Room.databaseBuilder(
                 context.applicationContext,
                 GymsDataBase::class.java,
@@ -25,7 +25,7 @@ abstract class GymsDataBase : RoomDatabase() {
             ).fallbackToDestructiveMigration()
                 .build()
         }
-        fun getDaoInstance(context: Context) : GymsDao{
+        fun getDaoInstance(context: Context) : GymsDao {
             synchronized(this){
                 if (daoInstance == null) daoInstance = buildDatabase(context).dao
                 return daoInstance as GymsDao

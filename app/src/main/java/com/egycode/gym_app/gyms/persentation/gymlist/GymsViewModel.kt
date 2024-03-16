@@ -1,4 +1,4 @@
-package com.egycode.gym_app
+package com.egycode.gym_app.gyms.persentation.gymlist
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.egycode.gym_app.gyms.domain.GetInitialGymsUseCase
+import com.egycode.gym_app.gyms.domain.ToggleFavouriteStateUserCase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
@@ -22,7 +24,8 @@ class GymsViewModel : ViewModel() {
     val state : State<GymsScreenState>
         get() = derivedStateOf { _state }
 
-    private val repo = GymsRepository()
+    private val getAllGymsUseCase = GetInitialGymsUseCase()
+    private val toggleFavouriteStateUserCase = ToggleFavouriteStateUserCase()
 
     private val errorHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
@@ -38,16 +41,14 @@ class GymsViewModel : ViewModel() {
 
     private fun getGyms() {
         viewModelScope.launch(errorHandler) {
-            val gyms = repo.getAllGyms()
+            val gyms = getAllGymsUseCase()
             _state = GymsScreenState(gyms, false)
         }
     }
 
-    fun toggleFavouriteState(gymId: Int) {
-        val gyms = _state.gyms.toMutableList()
-        val indexGym = gyms.indexOfFirst { it.id == gymId }
+    fun toggleFavouriteState(gymId: Int , oldState : Boolean) {
         viewModelScope.launch {
-           val updateGymsList = repo.toggleFavoriteGym(gymId, !gyms[indexGym].isFavourite)
+           val updateGymsList = toggleFavouriteStateUserCase(gymId,oldState)
             _state = _state.copy(gyms = updateGymsList)
         }
     }
