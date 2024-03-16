@@ -8,5 +8,6 @@
 - Retrofit
 - Room
 - Presentation Patterns
+- Clean Architecture
   
 ## Note: The application is still under development 
