@@ -9,5 +9,6 @@
 - Room
 - Presentation Patterns
 - Clean Architecture
+- Dagger Hilt
   
 ## Note: The application is still under development 
