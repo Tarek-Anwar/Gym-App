@@ -9,10 +9,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.egycode.gym_app.gyms.domain.GetInitialGymsUseCase
 import com.egycode.gym_app.gyms.domain.ToggleFavouriteStateUserCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GymsViewModel : ViewModel() {
+@HiltViewModel
+class GymsViewModel @Inject constructor(
+    private val getAllGymsUseCase: GetInitialGymsUseCase,
+    private val toggleFavouriteStateUserCase: ToggleFavouriteStateUserCase
+) : ViewModel() {
 
     private var _state by mutableStateOf(
         GymsScreenState(
@@ -21,11 +27,9 @@ class GymsViewModel : ViewModel() {
         )
     )
 
-    val state : State<GymsScreenState>
+    val state: State<GymsScreenState>
         get() = derivedStateOf { _state }
 
-    private val getAllGymsUseCase = GetInitialGymsUseCase()
-    private val toggleFavouriteStateUserCase = ToggleFavouriteStateUserCase()
 
     private val errorHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()
@@ -46,9 +50,9 @@ class GymsViewModel : ViewModel() {
         }
     }
 
-    fun toggleFavouriteState(gymId: Int , oldState : Boolean) {
+    fun toggleFavouriteState(gymId: Int, oldState: Boolean) {
         viewModelScope.launch {
-           val updateGymsList = toggleFavouriteStateUserCase(gymId,oldState)
+            val updateGymsList = toggleFavouriteStateUserCase(gymId, oldState)
             _state = _state.copy(gyms = updateGymsList)
         }
     }

@@ -19,11 +19,7 @@ import com.egycode.gym_app.gyms.persentation.gymlist.DefaultIcon
 import com.egycode.gym_app.gyms.persentation.gymlist.GymDetails
 
 @Composable
-fun GymDetailsScreen() {
-
-    val viewModel: GymDetailsViewModel = viewModel()
-    val state = viewModel.state.value
-
+fun GymDetailsScreen( state : GymDetailsState) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxWidth()
@@ -54,9 +50,7 @@ fun GymDetailsScreen() {
         }
 
         if (state.isLoading) CircularProgressIndicator()
-        if(state.gym == null)
-        {
-            Text(text = state.error.toString())
-        }
+        state.error?.let { Text(text = state.error.toString()) }
+
     }
 }

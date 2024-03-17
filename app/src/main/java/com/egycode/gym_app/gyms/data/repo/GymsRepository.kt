@@ -1,32 +1,27 @@
 package com.egycode.gym_app.gyms.data.repo
 
-import com.egycode.gym_app.GymsApplication
-import com.egycode.gym_app.gyms.data.local.GymsDataBase
+import com.egycode.gym_app.gyms.data.local.GymsDao
 import com.egycode.gym_app.gyms.data.local.LocalGym
 import com.egycode.gym_app.gyms.data.local.LocalGymsFavouriteState
 import com.egycode.gym_app.gyms.data.remote.GymApiService
 import com.egycode.gym_app.gyms.domain.Gym
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class GymsRepository {
-
-    private var gymApiService: GymApiService = Retrofit.Builder()
-        .baseUrl("https://gyms-fe7ee-default-rtdb.firebaseio.com/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(GymApiService::class.java)
-
-    private val gymsDao = GymsDataBase.getDaoInstance(GymsApplication.getApplicationContext())
+@Singleton
+class GymsRepository @Inject constructor(
+    private var gymApiService: GymApiService,
+    private val gymsDao: GymsDao
+) {
 
 
     private suspend fun updateLocalDatabase() {
         val gyms = gymApiService.getGyms()
         val favouriteGymsList = gymsDao.getFavouriteGyms()
         gymsDao.addAllGyms(
-            gyms.map { LocalGym( it.id, it.name, it.place, it.isOpen) }
+            gyms.map { LocalGym(it.id, it.name, it.place, it.isOpen) }
         )
         gymsDao.updateAllFavourite(favouriteGymsList.map {
             LocalGymsFavouriteState(it.id, true)
@@ -42,12 +37,17 @@ class GymsRepository {
         }
     }
 
-    suspend fun getGyms() = withContext(Dispatchers.IO) { gymsDao.getAllGyms().map {
-        Gym(it.id, it.name, it.place, it.isOpen,it.isFavourite)
-    } }
+    suspend fun getGyms() = withContext(Dispatchers.IO) {
+        gymsDao.getAllGyms().map {
+            Gym(it.id, it.name, it.place, it.isOpen, it.isFavourite)
+        }
+    }
+
     suspend fun toggleFavoriteGym(gymId: Int, state: Boolean) =
         withContext(Dispatchers.IO) {
             gymsDao.setFavouriteGym(LocalGymsFavouriteState(gymId, state))
             gymsDao.getAllGyms()
         }
+
+
 }
