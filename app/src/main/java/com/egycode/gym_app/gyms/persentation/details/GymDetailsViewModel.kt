@@ -10,11 +10,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.egycode.gym_app.gyms.data.repo.GymDetailsRepo
 import com.egycode.gym_app.gyms.domain.Gym
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GymDetailsViewModel(
-    private val saveStateHandle: SavedStateHandle
+@HiltViewModel
+class GymDetailsViewModel @Inject constructor (
+    private val saveStateHandle: SavedStateHandle,
+    private val repo: GymDetailsRepo
 ) : ViewModel() {
 
     private var _state by mutableStateOf(
@@ -27,7 +31,6 @@ class GymDetailsViewModel(
     val state: State<GymDetailsState>
         get() = derivedStateOf { _state }
 
-    private val repo = GymDetailsRepo()
 
     private val errorHandler = CoroutineExceptionHandler { _, throwable ->
         throwable.printStackTrace()

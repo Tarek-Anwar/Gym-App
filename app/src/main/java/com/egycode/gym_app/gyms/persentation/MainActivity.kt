@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -12,9 +13,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.egycode.gym_app.gyms.persentation.details.GymDetailsScreen
+import com.egycode.gym_app.gyms.persentation.details.GymDetailsState
+import com.egycode.gym_app.gyms.persentation.details.GymDetailsViewModel
 import com.egycode.gym_app.gyms.persentation.gymlist.GymScreen
 import com.egycode.gym_app.gyms.persentation.gymlist.GymsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +36,7 @@ private fun GymsAroundApp() {
 
     NavHost(navController = navController, startDestination = "gyms") {
         composable(route = "gyms") {
-            val vm: GymsViewModel = viewModel()
+            val vm: GymsViewModel = hiltViewModel()
             GymScreen(vm.state.value, { navController.navigate("gyms/$it") }) { id, isFavourite ->
                 vm.toggleFavouriteState(id, isFavourite)
             }
@@ -49,7 +54,9 @@ private fun GymsAroundApp() {
                 })
 
         ) {
-            GymDetailsScreen()
+            val vm : GymDetailsViewModel = hiltViewModel()
+
+            GymDetailsScreen(vm.state.value)
         }
 
     }
